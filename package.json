@@ -1,0 +1,25 @@
+{
+    "name": "@typedoc-react/docgen",
+    "version": "1.0.0",
+    "description": "DocGen for typedoc-react",
+    "main": "index.js",
+    "keywords": [
+        "docgen"
+    ],
+    "bin": {
+        "react-typedoc": "bin/docgen"
+    },
+    "author": "Zachary Kohnen (DusterTheFirst)",
+    "license": "GPL-3.0",
+    "dependencies": {
+        "chalk": "^2.4.1",
+        "commander": "^2.19.0",
+        "tslib": "^1.9.3",
+        "tslint": "^5.11.0",
+        "typescript": "^3.1.6"
+    },
+    "devDependencies": {
+        "@types/node": "^10.12.2",
+        "tslint-language-service": "^0.9.9"
+    }
+}
