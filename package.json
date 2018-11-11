@@ -1,6 +1,6 @@
 {
-    "name": "@typedoc-react/docgen",
-    "version": "1.0.0",
+    "name": "@reacttypedoc/docgen",
+    "version": "0.1.0",
     "description": "DocGen for typedoc-react",
     "main": "index.js",
     "keywords": [
