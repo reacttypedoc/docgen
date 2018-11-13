@@ -25,6 +25,8 @@ let styles = [
 ];
 console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
+
+// TODO: 
 (() => {
     let options: IOptions =
         commander
