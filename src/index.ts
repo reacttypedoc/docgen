@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import commander from "commander";
 import fs from "fs";
-import inquirer from "inquirer";
 import path from "path";
 import ts from "typescript";
 import generateDocumentation from "./generateDoc";
@@ -29,7 +28,7 @@ console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
 // TODO: gIT intEgrATION AND INQUIRERE
 (async () => {
-    let options: IOptions =
+    // let options: IOptions =
         commander
             .version("0.0.1")
             .usage("[options] <path>")
@@ -58,44 +57,6 @@ console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
     } else {
         console.log(chalk`{green Using project directory {blue '${projectPath}'}}`);
     }
-
-    enum OutputType {
-        Bundled,
-        JSON,
-        Branch
-    }
-    interface IPromptResult {
-        outputType: "bundled";
-    }
-    let promptResults = await inquirer.prompt<IPromptResult>([
-        {
-            choices: [
-                {
-                    name: "Bundled (single version)",
-                    value: OutputType.Bundled
-                },
-                {
-                    name: "Single JSON file with the documentation",
-                    value: OutputType.JSON
-                },
-                {
-                    name: "In a 'docs' branch (Must be hosted on github)",
-                    value: OutputType.Branch
-                }
-            ],
-            message: "How should the documentation be outputed",
-            name: "outputType",
-            type: "list",
-        }
-    ]);
-    console.log(promptResults);
-
-    console.log(docsBranch.name());
-    console.log(remote.name(), remote.url());
-    console.log(repository.path());
-
-    // TODO: FINISH GIT INTEGRATION
-    return;
 
     let tsconfigPath = ts.findConfigFile(projectPath, (s) => ts.sys.fileExists(s), "tsconfig.json");
 

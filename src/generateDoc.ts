@@ -1,17 +1,6 @@
 import chalk from "chalk";
 import ts from "typescript";
 
-// interface IDocEntry {
-//     name?: string;
-//     fileName?: string;
-//     documentation?: string;
-//     type?: string;
-//     entryType?: string;
-//     constructors?: IDocEntry[];
-//     parameters?: IDocEntry[];
-//     returnType?: string;
-// }
-
 export default function generateDocumentation(fileNames: string[], options: ts.CompilerOptions): IDocumentation {
     let program = ts.createProgram(fileNames, options);
     let checker = program.getTypeChecker();
@@ -43,6 +32,9 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
                     node.members.forEach((member) => {
                         // Check if it has a name
                         if (member.name !== undefined) {
+                            // TODO: kind of and type of the member
+                            console.log(ts.SyntaxKind[member.kind]);
+
                             console.group();
 
                             // TODO: name
@@ -56,8 +48,9 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
                                 console.log(member.name.expression);
                             }
 
-                            // TODO: kind of and type of the member
-                            console.log(ts.SyntaxKind[member.kind]);
+                            let type = checker.getTypeAtLocation(member);
+
+                            console.log(ts.TypeFlags[type.flags], checker.typeToString(type));
 
                             console.groupEnd();
                         }
@@ -73,18 +66,23 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
     }
 
     return {
-        classes
+        classes,
+        custom: {},
+        meta: {
+            date: Date.now(),
+            version: "TODO"
+        }
     };
 
 }
 
 // FIXME: Find a reliable (one that i understand) way to check if a node is exported
-function isNodeExported(node: ts.Node): boolean {
-    return (
-        (ts.getCombinedModifierFlags({...node, _declarationBrand: ""}) & ts.ModifierFlags.Export) !== 0 ||
-        (node.parent.kind === ts.SyntaxKind.SourceFile)
-    );
-}
+// function isNodeExported(node: ts.Node): boolean {
+//     return (
+//         (ts.getCombinedModifierFlags({...node, _declarationBrand: ""}) & ts.ModifierFlags.Export) !== 0 ||
+//         (node.parent.kind === ts.SyntaxKind.SourceFile)
+//     );
+// }
 
 /** FIXME: OLD THING */
 //     let output: IDocEntry[] = [];
