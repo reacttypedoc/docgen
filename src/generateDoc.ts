@@ -1,16 +1,16 @@
 import chalk from "chalk";
 import ts from "typescript";
 
-interface IDocEntry {
-    name?: string;
-    fileName?: string;
-    documentation?: string;
-    type?: string;
-    entryType?: string;
-    constructors?: IDocEntry[];
-    parameters?: IDocEntry[];
-    returnType?: string;
-}
+// interface IDocEntry {
+//     name?: string;
+//     fileName?: string;
+//     documentation?: string;
+//     type?: string;
+//     entryType?: string;
+//     constructors?: IDocEntry[];
+//     parameters?: IDocEntry[];
+//     returnType?: string;
+// }
 
 export default function generateDocumentation(fileNames: string[], options: ts.CompilerOptions): IDocumentation {
     let program = ts.createProgram(fileNames, options);
@@ -19,15 +19,56 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
     let classes: IClass[] = [];
 
     for (let sourceFile of program.getSourceFiles()) {
+        // Ignore .d.ts TODO: add confic optiion to opt in or out of declarations
         if (!sourceFile.isDeclarationFile) {
             console.log(chalk`{yellow.bold Reading types of file} {yellow '${sourceFile.fileName}'}`);
+            console.group();
 
+            // Read all items in the file
             ts.forEachChild(sourceFile, (node) => {
+                // Get the kind of syntax of the node
+                console.log(chalk`{bgBlue Syntax Kind:} {magenta ${ts.SyntaxKind[node.kind]}}`);
+                console.group();
+
+                // Check if it is a class
                 if (ts.isClassDeclaration(node) && node.name !== undefined) {
 
+                    // Get the name of the class
+                    console.log(chalk`{green Name:} {blue ${node.name.text}}`);
+
+                    console.log(chalk`{green Members:}`);
+                    console.group();
+
+                    // Get all the members of the class
+                    node.members.forEach((member) => {
+                        // Check if it has a name
+                        if (member.name !== undefined) {
+                            console.group();
+
+                            // TODO: name
+                            if (ts.isStringLiteral(member.name)) {
+                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
+                            } else if (ts.isNumericLiteral(member.name)) {
+                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
+                            } else if (ts.isIdentifier(member.name)) {
+                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
+                            } else if (ts.isComputedPropertyName(member.name)) {
+                                console.log(member.name.expression);
+                            }
+
+                            // TODO: kind of and type of the member
+                            console.log(ts.SyntaxKind[member.kind]);
+
+                            console.groupEnd();
+                        }
+                    });
+                    console.groupEnd();
                 }
-                console.log(ts.SyntaxKind[node.kind]);
+
+                console.groupEnd();
             });
+
+            console.groupEnd();
         }
     }
 
@@ -37,13 +78,15 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
 
 }
 
+// FIXME: Find a reliable (one that i understand) way to check if a node is exported
 function isNodeExported(node: ts.Node): boolean {
     return (
-        (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) !== 0 ||
+        (ts.getCombinedModifierFlags({...node, _declarationBrand: ""}) & ts.ModifierFlags.Export) !== 0 ||
         (node.parent.kind === ts.SyntaxKind.SourceFile)
     );
 }
 
+/** FIXME: OLD THING */
 //     let output: IDocEntry[] = [];
 
 //     for (const sourceFile of program.getSourceFiles()) {

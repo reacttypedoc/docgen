@@ -17,8 +17,15 @@ export interface ITSConfig {
     exclude: string[];
 }
 
-(() => {
+// Show pallate
+let styles = [
+    "bold", "dim", "italic", "underline", "inverse", "strikethrough", "black",
+    "red", "green", "yellow", "blue", "magenta", "cyan", "white", "gray", "bgBlack",
+    "bgRed", "bgGreen", "bgYellow", "bgBlue", "bgMagenta", "bgCyan", "bgWhite",
+];
+console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
+(() => {
     let options: IOptions =
         commander
             .version("0.0.1")
@@ -70,6 +77,7 @@ export interface ITSConfig {
     console.log(chalk`{green Using TypeScript {blue v${ts.version}}}`);
     console.log(chalk`{green Using config file {blue ${tsconfigPath}}}`);
 
+    // TODO: GIT INTEGRATION
     let out = generateDocumentation(files, parsedConfig.options);
 
     console.log(JSON.stringify(out, null, 4));

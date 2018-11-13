@@ -1,0 +1,8 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "description": "React TypeDoc test",
+  "main": "index.js",
+  "author": "DusterTheFirst <dusterthefirst@gmail.com> (Zachary Kohnen)",
+  "license": "GPL-3.0"
+}

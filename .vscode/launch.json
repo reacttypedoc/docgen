@@ -6,18 +6,18 @@
     "configurations": [
         {
             "type": "node",
-            "request": "attach",
-            "name": "Attach",
-            "port": 9229
-        },
-        {
-            "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/src/index.ts",
+            "program": "${workspaceFolder}\\bin\\docgen",
+            "args": [
+                "./test",
+                "-o",
+                "./testDoc"
+            ],
             "outFiles": [
-                "${workspaceFolder}/bin/*.js"
-            ]
+                "${workspaceFolder}\\bin\\*.js"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }
