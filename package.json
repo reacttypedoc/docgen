@@ -9,18 +9,24 @@
     "bin": {
         "react-typedoc": "bin/docgen"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/reacttypedoc/docgen.git"
+    },
     "author": "Zachary Kohnen (DusterTheFirst)",
     "license": "GPL-3.0",
     "dependencies": {
         "@types/nodegit": "^0.22.4",
         "chalk": "^2.4.1",
         "commander": "^2.19.0",
+        "inquirer": "^6.2.0",
         "nodegit": "^0.23.0",
         "tslib": "^1.9.3",
         "tslint": "^5.11.0",
         "typescript": "^3.1.6"
     },
     "devDependencies": {
+        "@types/inquirer": "0.0.43",
         "@types/node": "^10.12.2",
         "tslint-language-service": "^0.9.9"
     }

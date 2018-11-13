@@ -8,14 +8,14 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\bin\\docgen",
+            "program": "${workspaceFolder}/bin/docgen",
             "args": [
                 "./test",
                 "-o",
                 "./testDoc"
             ],
             "outFiles": [
-                "${workspaceFolder}\\bin\\*.js"
+                "${workspaceFolder}/bin/*.js"
             ],
             "console": "integratedTerminal"
         }

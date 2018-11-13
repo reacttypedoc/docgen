@@ -1,9 +1,11 @@
 import chalk from "chalk";
 import commander from "commander";
 import fs from "fs";
+import inquirer from "inquirer";
 import path from "path";
 import ts from "typescript";
 import generateDocumentation from "./generateDoc";
+import { expandInputFiles } from "./util";
 
 // Declaration for types of the arguments
 export interface IOptions {
@@ -25,35 +27,75 @@ let styles = [
 ];
 console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
-
 // TODO: gIT intEgrATION AND INQUIRERE
-(() => {
+(async () => {
     let options: IOptions =
         commander
             .version("0.0.1")
             .usage("[options] <path>")
-            .option("-o --out [path]", "Path to the output directory")
+            // .option("-o --out [path]", "Path to the output directory")
             .parse(process.argv)
             .opts();
 
-    let inputPath = commander.args[0] as (string | undefined);
+    let rawPath = commander.args[0] as (string | undefined);
 
     // Get the project uri
-    let projectPath = inputPath === undefined ? process.cwd() : path.resolve(process.cwd(), inputPath);
+    let projectPath = rawPath === undefined ? process.cwd() : path.resolve(process.cwd(), rawPath);
 
-    let outDir: string;
-    if (options.out === undefined) {
-        console.log(chalk`{yellow Warning: There was no out directory specified, defaulting to 'docs'}`);
-        outDir = path.resolve(process.cwd(), "docs");
-    } else {
-        outDir = path.resolve(process.cwd(), options.out);
-    }
+    // let outDir: string;
+    // if (options.out === undefined) {
+    //     console.log(chalk`{yellow Warning: There was no out directory specified, defaulting to 'docs'}`);
+    //     outDir = path.resolve(process.cwd(), "docs");
+    // } else {
+    //     outDir = path.resolve(process.cwd(), options.out);
+    // }
 
     // Make sure the files exist
     if (!fs.existsSync(path.resolve(projectPath))) {
         console.log(chalk`{red Error: Directory '${projectPath}' does not exist}`);
         process.exit(1);
+        return;
+    } else {
+        console.log(chalk`{green Using project directory {blue '${projectPath}'}}`);
     }
+
+    enum OutputType {
+        Bundled,
+        JSON,
+        Branch
+    }
+    interface IPromptResult {
+        outputType: "bundled";
+    }
+    let promptResults = await inquirer.prompt<IPromptResult>([
+        {
+            choices: [
+                {
+                    name: "Bundled (single version)",
+                    value: OutputType.Bundled
+                },
+                {
+                    name: "Single JSON file with the documentation",
+                    value: OutputType.JSON
+                },
+                {
+                    name: "In a 'docs' branch (Must be hosted on github)",
+                    value: OutputType.Branch
+                }
+            ],
+            message: "How should the documentation be outputed",
+            name: "outputType",
+            type: "list",
+        }
+    ]);
+    console.log(promptResults);
+
+    console.log(docsBranch.name());
+    console.log(remote.name(), remote.url());
+    console.log(repository.path());
+
+    // TODO: FINISH GIT INTEGRATION
+    return;
 
     let tsconfigPath = ts.findConfigFile(projectPath, (s) => ts.sys.fileExists(s), "tsconfig.json");
 
@@ -84,32 +126,3 @@ console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
     console.log(JSON.stringify(out, null, 4));
 })();
-
-/**
- * Expand a list of input files.
- *
- * Searches for directories in the input files list and replaces them with a
- * listing of all TypeScript files within them. One may use the ```--exclude``` option
- * to filter out files with a pattern.
- *
- * @param inputFiles  The list of files that should be expanded.
- * @returns  The list of input files with expanded directories.
- */
-function expandInputFiles(directory: string): string[] {
-    let files: string[] = [];
-
-    function add(dirname: string) {
-        fs.readdirSync(dirname).forEach((file) => {
-            const realpath = path.join(dirname, file);
-            if (fs.statSync(realpath).isDirectory()) {
-                add(realpath);
-            } else if (/\.tsx?$/.test(realpath)) {
-                files.push(realpath);
-            }
-        });
-    }
-
-    add(directory);
-
-    return files;
-}
