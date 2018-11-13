@@ -26,7 +26,7 @@ let styles = [
 console.log(styles.map(x => chalk`{${x} ${x}}`).join(" "));
 
 
-// TODO: 
+// TODO: gIT intEgrATION AND INQUIRERE
 (() => {
     let options: IOptions =
         commander
