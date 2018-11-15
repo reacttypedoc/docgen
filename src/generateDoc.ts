@@ -33,14 +33,16 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
                         // Check if it has a name
                         if (member.name !== undefined) {
 
-                            let type = checker.getTypeAtLocation(member);
+                            let type = checker.getTypeAtLocation(member.name);
+                            let symbol = checker.getSymbolAtLocation(member.name);
+                            if (symbol === undefined) {return; }
 
                             // console.log(ts.TypeFlags[type.flags], checker.typeToString(type));
 
                             let memberName: string;
                             if (ts.isComputedPropertyName(member.name)) {
                                 console.log(member.name.expression, ts.TypeFlags[type.flags]);
-                                memberName = "EXPEREFDSADFFD";
+                                memberName = "ERR: UNPARSED";
                             } else {
                                 memberName = member.name.text;
                             }
@@ -54,8 +56,23 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
                                 } else if (ts.isIdentifier(member.name)) {
                                     console.log(chalk`{cyan ${node.name!.text}}.{cyan ${member.name.text}}: {green ${checker.typeToString(type)}}`);
                                 }
+                            } else if (member.kind === ts.SyntaxKind.MethodDeclaration) {
+                                let constructorType = checker.getTypeOfSymbolAtLocation(
+                                    symbol,
+                                    symbol.valueDeclaration
+                                );
+
+                                console.log(constructorType.getConstructSignatures().map(serializeSignature));
+
+                                if (ts.isStringLiteral(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}[{yellow.dim "${member.name.text}"}](): {green ${checker.typeToString(type)}}`);
+                                } else if (ts.isNumericLiteral(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}[{green.dim ${member.name.text}}](): {green ${checker.typeToString(type)}}`);
+                                } else if (ts.isIdentifier(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}.{yellow ${member.name.text}}(): {green ${checker.getTypeOfSymbolAtLocation(checker.getSymbolAtLocation(member.name), member)}}`);
+                                }
                             } else {
-                                console.log(member.name)
+                                console.log(ts.SyntaxKind[member.kind]);
                             }
                         }
                     });
@@ -77,6 +94,24 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
             version: "TODO"
         }
     };
+
+    /** Serialize a signature (call or construct) */
+    function serializeSignature(signature: ts.Signature) {
+        return {
+            description: ts.displayPartsToString(signature.getDocumentationComment(checker)),
+            parameters: signature.parameters.map(serializeSymbol),
+            returnType: checker.typeToString(signature.getReturnType())
+        };
+    }
+
+    /** Serialize a symbol into a json object */
+    function serializeSymbol(symbol: ts.Symbol) {
+        return {
+            description: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+            name: symbol.getName(),
+            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
+        };
+    }
 
 }
 
