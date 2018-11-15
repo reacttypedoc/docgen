@@ -32,27 +32,31 @@ export default function generateDocumentation(fileNames: string[], options: ts.C
                     node.members.forEach((member) => {
                         // Check if it has a name
                         if (member.name !== undefined) {
-                            // TODO: kind of and type of the member
-                            console.log(ts.SyntaxKind[member.kind]);
-
-                            console.group();
-
-                            // TODO: name
-                            if (ts.isStringLiteral(member.name)) {
-                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
-                            } else if (ts.isNumericLiteral(member.name)) {
-                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
-                            } else if (ts.isIdentifier(member.name)) {
-                                console.log(member.name.text, member.name.modifiers, member.name.decorators, ts.NodeFlags[member.name.flags]);
-                            } else if (ts.isComputedPropertyName(member.name)) {
-                                console.log(member.name.expression);
-                            }
 
                             let type = checker.getTypeAtLocation(member);
 
-                            console.log(ts.TypeFlags[type.flags], checker.typeToString(type));
+                            // console.log(ts.TypeFlags[type.flags], checker.typeToString(type));
 
-                            console.groupEnd();
+                            let memberName: string;
+                            if (ts.isComputedPropertyName(member.name)) {
+                                console.log(member.name.expression, ts.TypeFlags[type.flags]);
+                                memberName = "EXPEREFDSADFFD";
+                            } else {
+                                memberName = member.name.text;
+                            }
+
+                            // TODO: name
+                            if (member.kind === ts.SyntaxKind.PropertyDeclaration) {
+                                if (ts.isStringLiteral(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}[{yellow.dim "${member.name.text}"}]: {green ${checker.typeToString(type)}}`);
+                                } else if (ts.isNumericLiteral(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}[{green.dim ${member.name.text}}]: {green ${checker.typeToString(type)}}`);
+                                } else if (ts.isIdentifier(member.name)) {
+                                    console.log(chalk`{cyan ${node.name!.text}}.{cyan ${member.name.text}}: {green ${checker.typeToString(type)}}`);
+                                }
+                            } else {
+                                console.log(member.name)
+                            }
                         }
                     });
                     console.groupEnd();
